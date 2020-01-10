@@ -1,0 +1,40 @@
+CRON
+
+//emails
+* * * * * php /var/www/pbl/duran/prod/index.php "type=notify_email"
+* * * * * php /var/www/pbl/duran/dev/main/index.php "type=notify_email"
+
+//autostart nodejs
+@reboot forever /var/prj/duran/nodejs/exec/prod/server.js
+@reboot forever /var/prj/duran/nodejs/exec/dev/main/server.js
+@reboot forever /var/prj/duran/nodejs/exec/dev/yura/server.js
+
+GIT
+
+ln -s /var/www/pbl/duran/prod /var/prj/duran/git/prod/www_pbl
+ln -s /var/www/prv/duran/prod /var/prj/duran/git/prod/www_prv
+ln -s /var/prj/duran/nodejs/exec/prod /var/prj/duran/git/prod/nodejs_exec
+ln -s /var/prj/duran/nodejs/conf/prod /var/prj/duran/git/prod/nodejs_conf
+
+COMMANDS
+
+...
+
+BACKUPS
+
+add user duran_backup_download with chroot dir: /var/prj/duran/backup/data/download
+
+//mount on cron
+sudo mount --bind /var/prj/duran/backup/data/download /home/duran_backup_download/download
+
+//cron on other server
+30 * * * * php /var/prj/duran/backup_download/index.php
+
+//cron on this server
+0 * * * * php /var/prj/duran/backup/index.php "db"
+0 4 * * * php /var/prj/duran/backup/index.php "img"
+
+MOUNTS FOR DEVELOPERS
+
+sudo mount --bind /var/www/pbl/duran/dev/yura /home/yura/duran_dev_yura
+sudo mount --bind /var/www/pbl/duran/dev/natasha2/main /home/natasha/duran_dev_natasha2
